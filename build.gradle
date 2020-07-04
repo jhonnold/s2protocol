@@ -6,12 +6,7 @@ repositories {
     jcenter()
 
     maven {
-        url = "https://maven.pkg.github.com/jhonnold/mpq"
-
-        credentials {
-            username = project.hasProperty("github.user") ? project.property("github.user") : System.getenv("GITHUB_USER")
-            password = project.hasProperty("github.key") ? project.property("github.key") : System.getenv("GITHUB_KEY")
-        }
+        url = "https://dl.bintray.com/jhonnold/maven"
     }
 }
 
