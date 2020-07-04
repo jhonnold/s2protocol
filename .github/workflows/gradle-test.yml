@@ -1,0 +1,32 @@
+name: Gradle Test
+
+on:
+  push:
+    branches: 
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 8, 11 ]
+    name: Java ${{ matrix.java }} sample
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Java
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+
+    - name: Build with Gradle
+      run: gradle clean assemble
+      env:
+        GITHUB_USER: ${{ github.actor }}
+        GITHUB_KEY: ${{ secrets.GITHUBKEY }}
+
+    - name: Test with Gradle
+      run: gradle test

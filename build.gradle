@@ -1,0 +1,34 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+}
+
+repositories {
+    jcenter()
+
+    maven {
+        url = "https://maven.pkg.github.com/jhonnold/mpq"
+
+        credentials {
+            username = project.hasProperty("github.user") ? project.property("github.user") : System.getenv("GITHUB_USER")
+            password = project.hasProperty("github.key") ? project.property("github.key") : System.getenv("GITHUB_KEY")
+        }
+    }
+}
+
+dependencies {
+    implementation group: "org.jetbrains.kotlin", name: "kotlin-stdlib-jdk8"
+    implementation group: "me.honnold", name: "mpq", version: "1.0.0"
+
+    testImplementation group: "org.jetbrains.kotlin", name: "kotlin-test"
+    testImplementation group: "org.jetbrains.kotlin", name: "kotlin-test-junit"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+group 'me.honnold'
+version '1.0.0'
