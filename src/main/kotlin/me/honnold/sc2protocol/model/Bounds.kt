@@ -11,4 +11,8 @@ class Bounds(val offset: Long, val bits: Int) {
     }
 
     override fun hashCode(): Int = this.offset.hashCode() + this.bits.hashCode()
+
+    override fun toString(): String {
+        return "(%d,%d)".format(offset, bits)
+    }
 }
