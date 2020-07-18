@@ -6,6 +6,7 @@ import me.honnold.sc2protocol.decoder.VersionedBitDecoder
 import me.honnold.sc2protocol.model.data.Struct
 import me.honnold.sc2protocol.model.event.Attribute
 import me.honnold.sc2protocol.model.event.AttributeEvents
+import me.honnold.sc2protocol.model.event.Event
 import me.honnold.sc2protocol.model.type.TypeInfo
 import me.honnold.sc2protocol.util.BitBuffer
 import java.io.BufferedReader
@@ -50,6 +51,7 @@ class Protocol(build: Int) {
         reader.useLines { lines ->
             val iterator = lines.iterator()
 
+            // types
             var line: String
             while (iterator.hasNext()) {
                 line = iterator.next()
@@ -58,6 +60,7 @@ class Protocol(build: Int) {
                 this.infos.add(TypeInfo.from(line))
             }
 
+            // game events
             while (iterator.hasNext()) {
                 line = iterator.next()
                 if (line.isEmpty()) break
@@ -69,6 +72,7 @@ class Protocol(build: Int) {
             line = iterator.next()
             this.gameEventsTypeId = this.readTypeId(line)
 
+            // message events
             while (iterator.hasNext()) {
                 line = iterator.next()
                 if (line.isEmpty()) break
@@ -80,6 +84,7 @@ class Protocol(build: Int) {
             line = iterator.next()
             this.messageEventTypeId = this.readTypeId(line)
 
+            // tracker events
             while (iterator.hasNext()) {
                 line = iterator.next()
                 if (line.isEmpty()) break
@@ -91,6 +96,7 @@ class Protocol(build: Int) {
             line = iterator.next()
             this.trackerEventTypeId = this.readTypeId(line)
 
+            // important ids
             this.gameLoopDeltaTypeId = this.readTypeId(iterator.next())
             this.replayUserIdTypeId = this.readTypeId(iterator.next())
             this.replayHeaderTypeId = this.readTypeId(iterator.next())
@@ -153,19 +159,19 @@ class Protocol(build: Int) {
         return attributeEvents
     }
 
-    fun decodeGameEvents(contents: ByteBuffer): List<Map<*, *>> {
+    fun decodeGameEvents(contents: ByteBuffer): List<Event> {
         val decoder = BitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.gameEventsTypeId, this.gameEvents)
     }
 
-    fun decodeMessageEvents(contents: ByteBuffer): List<Map<*, *>> {
+    fun decodeMessageEvents(contents: ByteBuffer): List<Event> {
         val decoder = BitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.messageEventTypeId, this.messageEvents)
     }
 
-    fun decodeTrackerEvents(contents: ByteBuffer): List<Map<*, *>> {
+    fun decodeTrackerEvents(contents: ByteBuffer): List<Event> {
         val decoder = VersionedBitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.trackerEventTypeId, this.trackerEvents, false)
@@ -176,9 +182,9 @@ class Protocol(build: Int) {
         eventTypeId: Int,
         eventTypes: Map<Int, Pair<Int, String>>,
         decodeUserId: Boolean = true
-    ): List<Map<*, *>> {
+    ): List<Event> {
 
-        val events = ArrayList<Map<*, *>>()
+        val events = ArrayList<Event>()
         var loop = 0L
 
         while (decoder.input.hasRemaining()) {
@@ -189,7 +195,7 @@ class Protocol(build: Int) {
             if (delta !is Long) throw DataCorruptedException("Invalid game loop delta value: $delta")
             loop += delta
 
-            val userId = if (decodeUserId) decoder.get(this.replayUserIdTypeId) else null
+            val userId = if (decodeUserId) decoder.get(this.replayUserIdTypeId) as Struct else null
 
             val eventId = decoder.get(eventTypeId)
             if (eventId !is Long) throw DataCorruptedException("Invalid eventId value: $eventId")
@@ -199,14 +205,7 @@ class Protocol(build: Int) {
             val event = decoder.get(eventType.first)
             if (event !is Struct) throw DataCorruptedException("Invalid event value: $event")
 
-            // TODO: Make an "event" struct
-            val mutableEvent = HashMap(event.struct)
-            mutableEvent["eventId"] = eventId
-            mutableEvent["eventName"] = eventType.second
-            mutableEvent["loop"] = loop
-            mutableEvent["user"] = userId
-            events.add(mutableEvent)
-
+            events.add(Event(eventId, eventType.second, loop, userId, event))
             decoder.input.align()
         }
 
