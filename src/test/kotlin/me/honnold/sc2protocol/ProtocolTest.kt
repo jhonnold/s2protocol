@@ -1,6 +1,7 @@
 package me.honnold.sc2protocol
 
 import me.honnold.mpq.Archive
+import me.honnold.sc2protocol.model.Struct
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
@@ -19,14 +20,14 @@ class ProtocolTest {
         val contents = archive.userData!!.content
 
         val p = Protocol(80188)
-        val decodedHeader = p.decodeHeader(contents) as Map<String, Any?>
+        val decodedHeader = p.decodeHeader(contents)
 
-        assertTrue(decodedHeader["m_useScaledTime"] as Boolean)
+        assertTrue(decodedHeader["m_useScaledTime"])
         assertEquals(80188L, decodedHeader["m_dataBuildNum"])
         assertEquals(10318L, decodedHeader["m_elapsedGameLoops"])
         assertEquals(2L, decodedHeader["m_type"])
 
-        val version = decodedHeader["m_version"] as Map<String, Any?>
+        val version: Struct = decodedHeader["m_version"]
         assertEquals(0L, version["m_revision"])
         assertEquals(80188L, version["m_build"])
         assertEquals(1L, version["m_flags"])
@@ -34,7 +35,7 @@ class ProtocolTest {
         assertEquals(12L, version["m_minor"])
         assertEquals(80188L, version["m_baseBuild"])
 
-        val signature = toString(decodedHeader["m_signature"] as ByteBuffer)
+        val signature = toString(decodedHeader["m_signature"])
         assertTrue(signature.startsWith("StarCraft II replay"))
     }
 
@@ -45,14 +46,14 @@ class ProtocolTest {
         val contents = archive.getFileContents("replay.details")
 
         val p = Protocol(80188)
-        val decodedDetails = p.decodeDetails(contents) as Map<String, Any?>
+        val decodedDetails = p.decodeDetails(contents)
 
-        assertEquals("Ever Dream LE", toString(decodedDetails["m_title"] as ByteBuffer))
+        assertEquals("Ever Dream LE", toString(decodedDetails["m_title"]))
 
-        val players = decodedDetails["m_playerList"] as List<Map<String, Any?>>
+        val players: List<Struct> = decodedDetails["m_playerList"]
 
-        assertEquals("Terran", toString(players[1]["m_race"] as ByteBuffer))
-        assertEquals("&lt;xACABx&gt;<sp/>Zomby", toString(players[1]["m_name"] as ByteBuffer))
+        assertEquals("Terran", toString(players[1]["m_race"]))
+        assertEquals("&lt;xACABx&gt;<sp/>Zomby", toString(players[1]["m_name"]))
     }
 
     @Test
@@ -62,20 +63,17 @@ class ProtocolTest {
         val contents = archive.getFileContents("replay.initData")
 
         val p = Protocol(80188)
-        val decodedInitData = p.decodeInitData(contents) as Map<String, Any?>
+        val decodedInitData = p.decodeInitData(contents)
+        val syncLobbyState: Struct = decodedInitData["m_syncLobbyState"]
 
-        val userInitData =
-            (decodedInitData["m_syncLobbyState"] as Map<String, Any?>)["m_userInitialData"] as List<Map<String, Any?>>
-
+        val userInitData: List<Struct> = syncLobbyState["m_userInitialData"]
         assertEquals(16, userInitData.size)
         assertEquals(5L, userInitData[1]["m_highestLeague"])
-        assertEquals("xACABx", toString(userInitData[1]["m_clanTag"] as ByteBuffer))
-        assertEquals("Zomby", toString(userInitData[1]["m_name"] as ByteBuffer).toString())
+        assertEquals("xACABx", toString(userInitData[1]["m_clanTag"] ))
+        assertEquals("Zomby", toString(userInitData[1]["m_name"]))
         assertEquals(3908L, userInitData[1]["m_scaledRating"])
 
-        val gameDescription =
-            (decodedInitData["m_syncLobbyState"] as Map<String, Any?>)["m_gameDescription"] as Map<String, Any?>
-
+        val gameDescription: Struct = syncLobbyState["m_gameDescription"]
         assertEquals(216L, gameDescription["m_mapSizeY"])
         assertEquals(200L, gameDescription["m_mapSizeX"])
     }

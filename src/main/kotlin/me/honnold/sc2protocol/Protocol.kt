@@ -4,6 +4,7 @@ import me.honnold.sc2protocol.decoder.BitDecoder
 import me.honnold.sc2protocol.decoder.Decoder
 import me.honnold.sc2protocol.decoder.VersionedBitDecoder
 import me.honnold.sc2protocol.model.Attribute
+import me.honnold.sc2protocol.model.Struct
 import me.honnold.sc2protocol.model.event.AttributeEvents
 import me.honnold.sc2protocol.model.type.TypeInfo
 import me.honnold.sc2protocol.util.BitBuffer
@@ -98,22 +99,28 @@ class Protocol(build: Int) {
         }
     }
 
-    fun decodeHeader(contents: ByteBuffer): Any? {
+    fun decodeHeader(contents: ByteBuffer): Struct {
         val decoder = VersionedBitDecoder(this.infos, contents)
+        val header = decoder.get(this.replayHeaderTypeId)!!
 
-        return decoder.get(this.replayHeaderTypeId)
+        if (header !is Struct) throw DataCorruptedException("Header is incorrect class: ${header::class.simpleName}")
+        return header
     }
 
-    fun decodeDetails(contents: ByteBuffer): Any? {
+    fun decodeDetails(contents: ByteBuffer): Struct {
         val decoder = VersionedBitDecoder(this.infos, contents)
+        val details = decoder.get(this.gameDetailsTypeId)!!
 
-        return decoder.get(this.gameDetailsTypeId)
+        if (details !is Struct) throw DataCorruptedException("Details is incorrect class: ${details::class.simpleName}")
+        return details
     }
 
-    fun decodeInitData(contents: ByteBuffer): Any? {
+    fun decodeInitData(contents: ByteBuffer): Struct {
         val decoder = BitDecoder(this.infos, contents)
+        val initData = decoder.get(this.replayInitTypeId)!!
 
-        return decoder.get(this.replayInitTypeId)
+        if (initData !is Struct) throw DataCorruptedException("Init dat is incorrect class: ${initData::class.simpleName}")
+        return initData
     }
 
     fun decodeAttributeEvents(contents: ByteBuffer): AttributeEvents {
@@ -187,9 +194,10 @@ class Protocol(build: Int) {
                 ?: throw Exception("Unable to parse for $eventId")
 
             val event = decoder.get(eventType.first)
-            if (event !is Map<*, *>) throw DataCorruptedException("Invalid event value: $event")
+            if (event !is Struct) throw DataCorruptedException("Invalid event value: $event")
 
-            val mutableEvent = HashMap(event)
+            // TODO: Make an "event" struct
+            val mutableEvent = HashMap(event.struct)
             mutableEvent["eventId"] = eventId
             mutableEvent["eventName"] = eventType.second
             mutableEvent["loop"] = loop

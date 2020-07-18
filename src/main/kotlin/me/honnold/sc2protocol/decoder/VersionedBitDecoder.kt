@@ -2,6 +2,7 @@ package me.honnold.sc2protocol.decoder
 
 import me.honnold.sc2protocol.model.Bounds
 import me.honnold.sc2protocol.model.Field
+import me.honnold.sc2protocol.model.Struct
 import me.honnold.sc2protocol.model.type.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -157,7 +158,7 @@ class VersionedBitDecoder(
         return if (this.input.read(8) != 0L) this.get(id) else null
     }
 
-    override fun getStruct(fields: List<Field>): Map<String, Any?> {
+    override fun getStruct(fields: List<Field>): Struct {
         this.input.read(8)
 
         val length = this.getVNumber()
@@ -174,7 +175,7 @@ class VersionedBitDecoder(
             }
         }
 
-        return result
+        return Struct(result)
     }
 
 

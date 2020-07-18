@@ -2,6 +2,7 @@ package me.honnold.sc2protocol.decoder
 
 import me.honnold.sc2protocol.model.Bounds
 import me.honnold.sc2protocol.model.Field
+import me.honnold.sc2protocol.model.Struct
 import me.honnold.sc2protocol.model.type.*
 import me.honnold.sc2protocol.util.BitBuffer
 import java.nio.ByteBuffer
@@ -35,5 +36,5 @@ abstract class Decoder(val infos: List<TypeInfo>, buffer: ByteBuffer, order: Byt
     abstract fun getFourCC(): Long
     abstract fun getNumber(bounds: Bounds): Long
     abstract fun getOptional(id: Int): Any?
-    abstract fun getStruct(fields: List<Field>): Map<String, Any?>
+    abstract fun getStruct(fields: List<Field>): Struct
 }

@@ -2,6 +2,7 @@ package me.honnold.sc2protocol.decoder
 
 import me.honnold.sc2protocol.model.Bounds
 import me.honnold.sc2protocol.model.Field
+import me.honnold.sc2protocol.model.Struct
 import me.honnold.sc2protocol.model.type.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -72,11 +73,11 @@ class BitDecoder(infos: List<TypeInfo>, buffer: ByteBuffer, order: ByteOrder = B
         return if (this.getBool()) this.get(id) else null
     }
 
-    override fun getStruct(fields: List<Field>): Map<String, Any?> {
+    override fun getStruct(fields: List<Field>): Struct {
         val result = HashMap<String, Any?>()
 
         fields.forEach { result[it.name] = this.get(it.typeId) }
 
-        return result
+        return Struct(result)
     }
 }
