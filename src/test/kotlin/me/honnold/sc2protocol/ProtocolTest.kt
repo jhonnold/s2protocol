@@ -16,7 +16,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.userData!!.content
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
         val decodedHeader = p.decodeHeader(contents)
 
         assertTrue(decodedHeader["m_useScaledTime"])
@@ -42,7 +42,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.details")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
         val decodedDetails = p.decodeDetails(contents)
 
         val title: Blob = decodedDetails["m_title"]
@@ -62,7 +62,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.initData")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
         val decodedInitData = p.decodeInitData(contents)
         val syncLobbyState: Struct = decodedInitData["m_syncLobbyState"]
 
@@ -87,7 +87,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.attributes.events")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
         val events = p.decodeAttributeEvents(contents)
 
         assertNotNull(events)
@@ -131,7 +131,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.game.events")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
 
         val events = p.decodeGameEvents(contents)
         assertEquals(6846, events.size)
@@ -158,7 +158,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.message.events")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
 
         val events = p.decodeMessageEvents(contents)
 
@@ -172,7 +172,7 @@ class ProtocolTest {
         val archive = Archive(Paths.get(resource.toURI()))
         val contents = archive.getFileContents("replay.tracker.events")
 
-        val p = Protocol(80188)
+        val p = Protocol(Protocol.DEFAULT)
 
         val events = p.decodeTrackerEvents(contents)
 

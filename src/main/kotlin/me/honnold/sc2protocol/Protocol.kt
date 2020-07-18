@@ -23,6 +23,8 @@ class Protocol(build: Int) {
     companion object {
         private val EVENT_REGEX = Regex("([\\d]+):\\s+\\(([\\d]+),\\s+'([a-zA-Z.]+)'\\)")
         private val TYPE_ID_REGEX = Regex("([\\w]+)\\s+=\\s+([\\d]+)")
+
+        const val DEFAULT = 80188
     }
 
     private val infos = ArrayList<TypeInfo>()
