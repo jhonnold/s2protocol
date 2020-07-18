@@ -123,4 +123,43 @@ class ProtocolTest {
         assertEquals("yes", attributeFromScope16.value)
         assertEquals(16, attributeFromScope16.scope)
     }
+
+    @Test
+    fun decodeGameEvents() {
+        val resource = this::class.java.getResource("/archive.sc2replay")
+        val archive = Archive(Paths.get(resource.toURI()))
+        val contents = archive.getFileContents("replay.game.events")
+
+        val p = Protocol(80188)
+
+        val events = p.decodeGameEvents(contents)
+        assertEquals(6846, events.size)
+
+        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SGameUserLeaveEvent" })
+        assertEquals(
+            540,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdUpdateTargetPointEvent" })
+        assertEquals(
+            2106,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SControlGroupUpdateEvent" })
+        assertEquals(
+            4,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.STriggerSoundLengthSyncEvent" })
+        assertEquals(1, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSetSyncPlayingTimeEvent" })
+        assertEquals(1, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSetSyncLoadingTimeEvent" })
+        assertEquals(
+            1,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SUserFinishedLoadingSyncEvent" })
+        assertEquals(15, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCameraSaveEvent" })
+        assertEquals(765, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSelectionDeltaEvent" })
+        assertEquals(1996, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCameraUpdateEvent" })
+        assertEquals(471, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdEvent" })
+        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SUserOptionsEvent" })
+        assertEquals(
+            855,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCommandManagerStateEvent" })
+        assertEquals(
+            87,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdUpdateTargetUnitEvent" })
+    }
 }

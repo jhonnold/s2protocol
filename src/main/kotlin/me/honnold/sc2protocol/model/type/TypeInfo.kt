@@ -10,7 +10,7 @@ abstract class TypeInfo(open val method: TypeMethod) {
     companion object {
         private val METHOD_REGEX = Regex("^\\('(_[a-z]+)'")
         private val BOUNDS_REGEX = Regex("\\((-?[\\d]+),(-?[\\d]+)\\)")
-        private val FIELD_REGEX = Regex("\\('(m_[a-zA-Z]+)',(-?[\\d]+),(-?[\\d]+)\\)")
+        private val FIELD_REGEX = Regex("\\('([a-zA-Z_]+)',(-?[\\d]+),(-?[\\d]+)\\)")
         private val CHOICE_FIELD_REGEX = Regex("[\\d]+:\\('([\\w]+)',(-?[\\d]+)\\)")
         private val OPTIONAL_REGEX = Regex("\\[(-?[\\d]+)]")
 

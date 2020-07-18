@@ -1,6 +1,7 @@
 package me.honnold.sc2protocol
 
 import me.honnold.sc2protocol.decoder.BitDecoder
+import me.honnold.sc2protocol.decoder.Decoder
 import me.honnold.sc2protocol.decoder.VersionedBitDecoder
 import me.honnold.sc2protocol.model.Attribute
 import me.honnold.sc2protocol.model.AttributeEvents
@@ -139,6 +140,46 @@ class Protocol(build: Int) {
         }
 
         return attributeEvents
+    }
+
+    fun decodeGameEvents(contents: ByteBuffer): List<Any?> {
+        val decoder = BitDecoder(this.infos, contents)
+
+        return decodeEventStream(decoder, this.gameEventsTypeId, this.gameEvents)
+    }
+
+    private fun decodeEventStream(
+        decoder: Decoder,
+        eventTypeId: Int,
+        eventTypes: HashMap<Int, Pair<Int, String>>,
+        decodeUserId: Boolean = true
+    ): List<Any?> {
+        val events = ArrayList<Map<String, Any?>>()
+        var loop = 0L
+
+        while (decoder.input.hasRemaining()) {
+            val deltaTypeData = decoder.get(this.gameLoopDeltaTypeId)
+            try {
+                loop += (deltaTypeData as Pair<String, Any?>).second as Long
+            } catch (ignored: ClassCastException) {
+            }
+
+            val userId = if (decodeUserId) decoder.get(this.replayUserIdTypeId) else null
+
+            val eventId = decoder.get(eventTypeId) as Long
+            val eventType = eventTypes[eventId.toInt()] ?: throw Exception("Unable to parse for $eventId")
+
+            val event = HashMap(decoder.get(eventType.first) as Map<String, Any?>)
+            event["eventId"] = eventId
+            event["eventName"] = eventType.second
+            event["loop"] = loop
+            event["user"] = userId
+            events.add(event)
+
+            decoder.input.align()
+        }
+
+        return events
     }
 
     private fun readEventLine(line: String): AbstractMap.SimpleEntry<Int, Pair<Int, String>> {
