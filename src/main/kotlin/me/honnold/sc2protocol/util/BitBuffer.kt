@@ -1,17 +1,18 @@
 package me.honnold.sc2protocol.util
 
-import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.min
 
-class BitBuffer(private val buffer: ByteBuffer, private val order: ByteOrder) : Closeable {
+class BitBuffer(private val buffer: ByteBuffer, private val order: ByteOrder) {
     private var next = 0L
     private var nextBits = 0
 
     fun align() {
         this.nextBits = 0
     }
+
+    fun hasRemaining() = this.nextBits != 0 || buffer.hasRemaining()
 
     fun read(count: Int): Long {
         if (count == 0) return 0
@@ -50,6 +51,4 @@ class BitBuffer(private val buffer: ByteBuffer, private val order: ByteOrder) : 
 
         return buffer
     }
-
-    override fun close() {}
 }

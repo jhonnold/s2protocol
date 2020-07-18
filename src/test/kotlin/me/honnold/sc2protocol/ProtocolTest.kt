@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 fun toString(buffer: ByteBuffer) = StandardCharsets.UTF_8.decode(buffer).toString()
@@ -77,5 +78,49 @@ class ProtocolTest {
 
         assertEquals(216L, gameDescription["m_mapSizeY"])
         assertEquals(200L, gameDescription["m_mapSizeX"])
+    }
+
+    @Test
+    fun decodeAttributes() {
+        val resource = this::class.java.getResource("/archive.sc2replay")
+        val archive = Archive(Paths.get(resource.toURI()))
+        val contents = archive.getFileContents("replay.attributes.events")
+
+        val p = Protocol(80188)
+        val events = p.decodeAttributeEvents(contents)
+
+        assertNotNull(events)
+        assertEquals(0, events.source)
+        assertEquals(0, events.mapNamespace)
+
+        assertEquals(3, events.scopes.keys.size)
+        assertTrue(events.scopes.keys.contains(1))
+        assertTrue(events.scopes.keys.contains(2))
+        assertTrue(events.scopes.keys.contains(16))
+
+        assertEquals(75, events.scopes[1]!!.keys.size)
+        assertEquals(75, events.scopes[2]!!.keys.size)
+        assertEquals(10, events.scopes[16]!!.keys.size)
+
+        val attributeFromScope1 = events.scopes[1]!![500]
+        assertNotNull(attributeFromScope1)
+        assertEquals(999, attributeFromScope1.namespace)
+        assertEquals(500, attributeFromScope1.id)
+        assertEquals("Humn", attributeFromScope1.value)
+        assertEquals(1, attributeFromScope1.scope)
+
+        val attributeFromScope2 = events.scopes[2]!![3172]
+        assertNotNull(attributeFromScope2)
+        assertEquals(999, attributeFromScope2.namespace)
+        assertEquals(3172, attributeFromScope2.id)
+        assertEquals("AB00", attributeFromScope2.value)
+        assertEquals(2, attributeFromScope2.scope)
+
+        val attributeFromScope16 = events.scopes[16]!![1001]
+        assertNotNull(attributeFromScope16)
+        assertEquals(999, attributeFromScope16.namespace)
+        assertEquals(1001, attributeFromScope16.id)
+        assertEquals("yes", attributeFromScope16.value)
+        assertEquals(16, attributeFromScope16.scope)
     }
 }

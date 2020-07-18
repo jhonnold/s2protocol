@@ -2,10 +2,15 @@ package me.honnold.sc2protocol
 
 import me.honnold.sc2protocol.decoder.BitDecoder
 import me.honnold.sc2protocol.decoder.VersionedBitDecoder
+import me.honnold.sc2protocol.model.Attribute
+import me.honnold.sc2protocol.model.AttributeEvents
 import me.honnold.sc2protocol.model.type.TypeInfo
+import me.honnold.sc2protocol.util.BitBuffer
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
@@ -108,6 +113,32 @@ class Protocol(build: Int) {
         val decoder = BitDecoder(this.infos, contents)
 
         return decoder.get(this.replayInitTypeId)
+    }
+
+    fun decodeAttributeEvents(contents: ByteBuffer): AttributeEvents {
+        val buffer = BitBuffer(contents, ByteOrder.LITTLE_ENDIAN)
+        if (!buffer.hasRemaining()) throw IllegalArgumentException("contents must have data!")
+
+        val source = buffer.read(8).toInt()
+        val mapNamespace = buffer.read(32).toInt()
+        val attributeEvents = AttributeEvents(source, mapNamespace)
+
+        buffer.read(32) // ignored value (length of attributes)
+
+        while (buffer.hasRemaining()) {
+            val namespace = buffer.read(32).toInt()
+            val id = buffer.read(32).toInt()
+            val scope = buffer.read(8).toInt()
+
+            buffer.align()
+            val valueBuffer = buffer.readBytes(4)
+            val value = StandardCharsets.UTF_8.decode(valueBuffer).toString()
+                .replaceFirst("\u0000", "").reversed()
+
+            attributeEvents.addToScope(scope, Attribute(namespace, id, scope, value))
+        }
+
+        return attributeEvents
     }
 
     private fun readEventLine(line: String): AbstractMap.SimpleEntry<Int, Pair<Int, String>> {
