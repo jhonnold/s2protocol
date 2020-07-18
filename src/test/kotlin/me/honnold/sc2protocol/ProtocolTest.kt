@@ -176,4 +176,41 @@ class ProtocolTest {
         assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SChatMessage" })
         assertEquals(17, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SLoadingProgressMessage" })
     }
+
+    @Test
+    fun decodeTrackerEvents() {
+        val resource = this::class.java.getResource("/archive.sc2replay")
+        val archive = Archive(Paths.get(resource.toURI()))
+        val contents = archive.getFileContents("replay.tracker.events")
+
+        val p = Protocol(80188)
+
+        val events = p.decodeTrackerEvents(contents)
+
+        assertEquals(
+            133,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SPlayerStatsEvent" })
+        assertEquals(
+            72,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitDoneEvent" })
+        assertEquals(
+            170,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitDiedEvent" })
+        assertEquals(31, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUpgradeEvent" })
+        assertEquals(
+            75,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitInitEvent" })
+        assertEquals(
+            13,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitPositionsEvent" })
+        assertEquals(
+            565,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitBornEvent" })
+        assertEquals(
+            302,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitTypeChangeEvent" })
+        assertEquals(
+            2,
+            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SPlayerSetupEvent" })
+    }
 }

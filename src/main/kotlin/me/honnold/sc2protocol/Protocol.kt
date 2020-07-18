@@ -154,6 +154,12 @@ class Protocol(build: Int) {
         return decodeEventStream(decoder, this.messageEventTypeId, this.messageEvents)
     }
 
+    fun decodeTrackerEvents(contents: ByteBuffer): List<Any?> {
+        val decoder = VersionedBitDecoder(this.infos, contents)
+
+        return decodeEventStream(decoder, this.trackerEventTypeId, this.trackerEvents, false)
+    }
+
     private fun decodeEventStream(
         decoder: Decoder,
         eventTypeId: Int,
