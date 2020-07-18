@@ -135,32 +135,32 @@ class ProtocolTest {
         val events = p.decodeGameEvents(contents)
         assertEquals(6846, events.size)
 
-        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SGameUserLeaveEvent" })
+        assertEquals(2, events.count { it["eventName"] == "NNet.Game.SGameUserLeaveEvent" })
         assertEquals(
             540,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdUpdateTargetPointEvent" })
+            events.count { it["eventName"] == "NNet.Game.SCmdUpdateTargetPointEvent" })
         assertEquals(
             2106,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SControlGroupUpdateEvent" })
+            events.count { it["eventName"] == "NNet.Game.SControlGroupUpdateEvent" })
         assertEquals(
             4,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.STriggerSoundLengthSyncEvent" })
-        assertEquals(1, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSetSyncPlayingTimeEvent" })
-        assertEquals(1, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSetSyncLoadingTimeEvent" })
+            events.count { it["eventName"] == "NNet.Game.STriggerSoundLengthSyncEvent" })
+        assertEquals(1, events.count { it["eventName"] == "NNet.Game.SSetSyncPlayingTimeEvent" })
+        assertEquals(1, events.count { it["eventName"] == "NNet.Game.SSetSyncLoadingTimeEvent" })
         assertEquals(
             1,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SUserFinishedLoadingSyncEvent" })
-        assertEquals(15, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCameraSaveEvent" })
-        assertEquals(765, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SSelectionDeltaEvent" })
-        assertEquals(1996, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCameraUpdateEvent" })
-        assertEquals(471, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdEvent" })
-        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SUserOptionsEvent" })
+            events.count { it["eventName"] == "NNet.Game.SUserFinishedLoadingSyncEvent" })
+        assertEquals(15, events.count { it["eventName"] == "NNet.Game.SCameraSaveEvent" })
+        assertEquals(765, events.count { it["eventName"] == "NNet.Game.SSelectionDeltaEvent" })
+        assertEquals(1996, events.count { it["eventName"] == "NNet.Game.SCameraUpdateEvent" })
+        assertEquals(471, events.count { it["eventName"] == "NNet.Game.SCmdEvent" })
+        assertEquals(2, events.count { it["eventName"] == "NNet.Game.SUserOptionsEvent" })
         assertEquals(
             855,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCommandManagerStateEvent" })
+            events.count { it["eventName"] == "NNet.Game.SCommandManagerStateEvent" })
         assertEquals(
             87,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdUpdateTargetUnitEvent" })
+            events.count { it["eventName"] == "NNet.Game.SCmdUpdateTargetUnitEvent" })
     }
 
     @Test
@@ -173,8 +173,8 @@ class ProtocolTest {
 
         val events = p.decodeMessageEvents(contents)
 
-        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SChatMessage" })
-        assertEquals(17, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SLoadingProgressMessage" })
+        assertEquals(2, events.count { it["eventName"] == "NNet.Game.SChatMessage" })
+        assertEquals(17, events.count { it["eventName"] == "NNet.Game.SLoadingProgressMessage" })
     }
 
     @Test
@@ -189,28 +189,28 @@ class ProtocolTest {
 
         assertEquals(
             133,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SPlayerStatsEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SPlayerStatsEvent" })
         assertEquals(
             72,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitDoneEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitDoneEvent" })
         assertEquals(
             170,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitDiedEvent" })
-        assertEquals(31, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUpgradeEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitDiedEvent" })
+        assertEquals(31, events.count { it["eventName"] == "NNet.Replay.Tracker.SUpgradeEvent" })
         assertEquals(
             75,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitInitEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitInitEvent" })
         assertEquals(
             13,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitPositionsEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitPositionsEvent" })
         assertEquals(
             565,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitBornEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitBornEvent" })
         assertEquals(
             302,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SUnitTypeChangeEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SUnitTypeChangeEvent" })
         assertEquals(
             2,
-            events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Replay.Tracker.SPlayerSetupEvent" })
+            events.count { it["eventName"] == "NNet.Replay.Tracker.SPlayerSetupEvent" })
     }
 }

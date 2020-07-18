@@ -4,7 +4,7 @@ import me.honnold.sc2protocol.decoder.BitDecoder
 import me.honnold.sc2protocol.decoder.Decoder
 import me.honnold.sc2protocol.decoder.VersionedBitDecoder
 import me.honnold.sc2protocol.model.Attribute
-import me.honnold.sc2protocol.model.AttributeEvents
+import me.honnold.sc2protocol.model.event.AttributeEvents
 import me.honnold.sc2protocol.model.type.TypeInfo
 import me.honnold.sc2protocol.util.BitBuffer
 import java.io.BufferedReader
@@ -26,13 +26,13 @@ class Protocol(build: Int) {
     private val infos = ArrayList<TypeInfo>()
 
     var gameEventsTypeId = -1
-    val gameEvents = HashMap<Int, Pair<Int, String>>()
+    private val gameEvents = HashMap<Int, Pair<Int, String>>()
 
     var messageEventTypeId = -1
-    val messageEvents = HashMap<Int, Pair<Int, String>>()
+    private val messageEvents = HashMap<Int, Pair<Int, String>>()
 
     var trackerEventTypeId = -1
-    val trackerEvents = HashMap<Int, Pair<Int, String>>()
+    private val trackerEvents = HashMap<Int, Pair<Int, String>>()
 
     var gameLoopDeltaTypeId = -1
     var replayUserIdTypeId = -1
@@ -122,7 +122,8 @@ class Protocol(build: Int) {
 
         val source = buffer.read(8).toInt()
         val mapNamespace = buffer.read(32).toInt()
-        val attributeEvents = AttributeEvents(source, mapNamespace)
+        val attributeEvents =
+            AttributeEvents(source, mapNamespace)
 
         buffer.read(32) // ignored value (length of attributes)
 
@@ -142,19 +143,19 @@ class Protocol(build: Int) {
         return attributeEvents
     }
 
-    fun decodeGameEvents(contents: ByteBuffer): List<Any?> {
+    fun decodeGameEvents(contents: ByteBuffer): List<Map<*, *>> {
         val decoder = BitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.gameEventsTypeId, this.gameEvents)
     }
 
-    fun decodeMessageEvents(contents: ByteBuffer): List<Any?> {
+    fun decodeMessageEvents(contents: ByteBuffer): List<Map<*, *>> {
         val decoder = BitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.messageEventTypeId, this.messageEvents)
     }
 
-    fun decodeTrackerEvents(contents: ByteBuffer): List<Any?> {
+    fun decodeTrackerEvents(contents: ByteBuffer): List<Map<*, *>> {
         val decoder = VersionedBitDecoder(this.infos, contents)
 
         return decodeEventStream(decoder, this.trackerEventTypeId, this.trackerEvents, false)
@@ -163,30 +164,37 @@ class Protocol(build: Int) {
     private fun decodeEventStream(
         decoder: Decoder,
         eventTypeId: Int,
-        eventTypes: HashMap<Int, Pair<Int, String>>,
+        eventTypes: Map<Int, Pair<Int, String>>,
         decodeUserId: Boolean = true
-    ): List<Any?> {
-        val events = ArrayList<Map<String, Any?>>()
+    ): List<Map<*, *>> {
+
+        val events = ArrayList<Map<*, *>>()
         var loop = 0L
 
         while (decoder.input.hasRemaining()) {
             val deltaTypeData = decoder.get(this.gameLoopDeltaTypeId)
-            try {
-                loop += (deltaTypeData as Pair<String, Any?>).second as Long
-            } catch (ignored: ClassCastException) {
-            }
+            if (deltaTypeData !is Pair<*, *>) throw DataCorruptedException("Invalid game loop delta id: ${this.gameLoopDeltaTypeId} - $deltaTypeData")
+
+            val delta = deltaTypeData.second
+            if (delta !is Long) throw DataCorruptedException("Invalid game loop delta value: $delta")
+            loop += delta
 
             val userId = if (decodeUserId) decoder.get(this.replayUserIdTypeId) else null
 
-            val eventId = decoder.get(eventTypeId) as Long
-            val eventType = eventTypes[eventId.toInt()] ?: throw Exception("Unable to parse for $eventId")
+            val eventId = decoder.get(eventTypeId)
+            if (eventId !is Long) throw DataCorruptedException("Invalid eventId value: $eventId")
+            val eventType = eventTypes[eventId.toInt()]
+                ?: throw Exception("Unable to parse for $eventId")
 
-            val event = HashMap(decoder.get(eventType.first) as Map<String, Any?>)
-            event["eventId"] = eventId
-            event["eventName"] = eventType.second
-            event["loop"] = loop
-            event["user"] = userId
-            events.add(event)
+            val event = decoder.get(eventType.first)
+            if (event !is Map<*, *>) throw DataCorruptedException("Invalid event value: $event")
+
+            val mutableEvent = HashMap(event)
+            mutableEvent["eventId"] = eventId
+            mutableEvent["eventName"] = eventType.second
+            mutableEvent["loop"] = loop
+            mutableEvent["user"] = userId
+            events.add(mutableEvent)
 
             decoder.input.align()
         }
@@ -211,3 +219,5 @@ class Protocol(build: Int) {
         return gameEventTypeIdMatch.groups[2]!!.value.toInt()
     }
 }
+
+class DataCorruptedException(s: String) : RuntimeException(s)
