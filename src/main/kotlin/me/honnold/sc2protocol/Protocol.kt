@@ -148,6 +148,12 @@ class Protocol(build: Int) {
         return decodeEventStream(decoder, this.gameEventsTypeId, this.gameEvents)
     }
 
+    fun decodeMessageEvents(contents: ByteBuffer): List<Any?> {
+        val decoder = BitDecoder(this.infos, contents)
+
+        return decodeEventStream(decoder, this.messageEventTypeId, this.messageEvents)
+    }
+
     private fun decodeEventStream(
         decoder: Decoder,
         eventTypeId: Int,

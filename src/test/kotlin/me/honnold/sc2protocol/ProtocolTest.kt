@@ -162,4 +162,18 @@ class ProtocolTest {
             87,
             events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SCmdUpdateTargetUnitEvent" })
     }
+
+    @Test
+    fun decodeMessageEvents() {
+        val resource = this::class.java.getResource("/archive.sc2replay")
+        val archive = Archive(Paths.get(resource.toURI()))
+        val contents = archive.getFileContents("replay.message.events")
+
+        val p = Protocol(80188)
+
+        val events = p.decodeMessageEvents(contents)
+
+        assertEquals(2, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SChatMessage" })
+        assertEquals(17, events.count { (it as Map<String, Any?>)["eventName"] == "NNet.Game.SLoadingProgressMessage" })
+    }
 }
