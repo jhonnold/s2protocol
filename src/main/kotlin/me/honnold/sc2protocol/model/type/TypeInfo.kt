@@ -1,8 +1,5 @@
 package me.honnold.sc2protocol.model.type
 
-import me.honnold.sc2protocol.model.Bounds
-import me.honnold.sc2protocol.model.Field
-
 abstract class TypeInfo(open val method: TypeMethod) {
     open val p: Any? = null
     open val q: Any? = null

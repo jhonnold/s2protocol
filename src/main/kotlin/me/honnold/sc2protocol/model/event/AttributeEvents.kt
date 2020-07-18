@@ -1,7 +1,5 @@
 package me.honnold.sc2protocol.model.event
 
-import me.honnold.sc2protocol.model.Attribute
-
 class AttributeEvents(val source: Int, val mapNamespace: Int) {
     val scopes: MutableMap<Int, MutableMap<Int, Attribute>> = HashMap()
 

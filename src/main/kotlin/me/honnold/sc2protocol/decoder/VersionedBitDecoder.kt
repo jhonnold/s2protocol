@@ -1,11 +1,11 @@
 package me.honnold.sc2protocol.decoder
 
-import me.honnold.sc2protocol.model.*
+import me.honnold.sc2protocol.model.data.BitArray
+import me.honnold.sc2protocol.model.data.Blob
+import me.honnold.sc2protocol.model.data.Struct
 import me.honnold.sc2protocol.model.type.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.util.*
-import kotlin.collections.HashMap
 
 class VersionedBitDecoder(
     infos: List<TypeInfo>,

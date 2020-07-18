@@ -1,10 +1,8 @@
 package me.honnold.sc2protocol
 
 import me.honnold.mpq.Archive
-import me.honnold.sc2protocol.model.Blob
-import me.honnold.sc2protocol.model.Struct
-import java.nio.ByteBuffer
-import java.nio.charset.StandardCharsets
+import me.honnold.sc2protocol.model.data.Blob
+import me.honnold.sc2protocol.model.data.Struct
 import java.nio.file.Paths
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -21,20 +19,20 @@ class ProtocolTest {
         val p = Protocol(80188)
         val decodedHeader = p.decodeHeader(contents)
 
-        assertTrue(decodedHeader["m_useScaledTime"]!!)
-        assertEquals(80188L, decodedHeader["m_dataBuildNum"]!!)
-        assertEquals(10318L, decodedHeader["m_elapsedGameLoops"]!!)
-        assertEquals(2L, decodedHeader["m_type"]!!)
+        assertTrue(decodedHeader["m_useScaledTime"])
+        assertEquals(80188L, decodedHeader["m_dataBuildNum"])
+        assertEquals(10318L, decodedHeader["m_elapsedGameLoops"])
+        assertEquals(2L, decodedHeader["m_type"])
 
-        val version: Struct = decodedHeader["m_version"]!!
-        assertEquals(0L, version["m_revision"]!!)
-        assertEquals(80188L, version["m_build"]!!)
-        assertEquals(1L, version["m_flags"]!!)
-        assertEquals(4L, version["m_major"]!!)
-        assertEquals(12L, version["m_minor"]!!)
-        assertEquals(80188L, version["m_baseBuild"]!!)
+        val version: Struct = decodedHeader["m_version"]
+        assertEquals(0L, version["m_revision"])
+        assertEquals(80188L, version["m_build"])
+        assertEquals(1L, version["m_flags"])
+        assertEquals(4L, version["m_major"])
+        assertEquals(12L, version["m_minor"])
+        assertEquals(80188L, version["m_baseBuild"])
 
-        val signature: Blob = decodedHeader["m_signature"]!!
+        val signature: Blob = decodedHeader["m_signature"]
         assertTrue(signature.value.startsWith("StarCraft II replay"))
     }
 
@@ -47,14 +45,14 @@ class ProtocolTest {
         val p = Protocol(80188)
         val decodedDetails = p.decodeDetails(contents)
 
-        val title: Blob = decodedDetails["m_title"]!!
+        val title: Blob = decodedDetails["m_title"]
         assertEquals("Ever Dream LE", title.value)
 
-        val players: List<Struct> = decodedDetails["m_playerList"]!!
+        val players: List<Struct> = decodedDetails["m_playerList"]
 
-        val race: Blob = players[1]["m_race"]!!
+        val race: Blob = players[1]["m_race"]
         assertEquals("Terran", race.value)
-        val name: Blob = players[1]["m_name"]!!
+        val name: Blob = players[1]["m_name"]
         assertEquals("&lt;xACABx&gt;<sp/>Zomby", name.value)
     }
 
@@ -66,21 +64,21 @@ class ProtocolTest {
 
         val p = Protocol(80188)
         val decodedInitData = p.decodeInitData(contents)
-        val syncLobbyState: Struct = decodedInitData["m_syncLobbyState"]!!
+        val syncLobbyState: Struct = decodedInitData["m_syncLobbyState"]
 
-        val userInitData: List<Struct> = syncLobbyState["m_userInitialData"]!!
+        val userInitData: List<Struct> = syncLobbyState["m_userInitialData"]
         assertEquals(16, userInitData.size)
-        assertEquals(5L, userInitData[1]["m_highestLeague"]!!)
+        assertEquals(5L, userInitData[1]["m_highestLeague"])
 
-        val clanTag: Blob = userInitData[1]["m_clanTag"]!!
+        val clanTag: Blob = userInitData[1]["m_clanTag"]
         assertEquals("xACABx", clanTag.value)
-        val name: Blob = userInitData[1]["m_name"]!!
+        val name: Blob = userInitData[1]["m_name"]
         assertEquals("Zomby", name.value)
-        assertEquals(3908L, userInitData[1]["m_scaledRating"]!!)
+        assertEquals(3908L, userInitData[1]["m_scaledRating"])
 
-        val gameDescription: Struct = syncLobbyState["m_gameDescription"]!!
-        assertEquals(216L, gameDescription["m_mapSizeY"]!!)
-        assertEquals(200L, gameDescription["m_mapSizeX"]!!)
+        val gameDescription: Struct = syncLobbyState["m_gameDescription"]
+        assertEquals(216L, gameDescription["m_mapSizeY"])
+        assertEquals(200L, gameDescription["m_mapSizeX"])
     }
 
     @Test

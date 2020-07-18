@@ -3,8 +3,8 @@ package me.honnold.sc2protocol
 import me.honnold.sc2protocol.decoder.BitDecoder
 import me.honnold.sc2protocol.decoder.Decoder
 import me.honnold.sc2protocol.decoder.VersionedBitDecoder
-import me.honnold.sc2protocol.model.Attribute
-import me.honnold.sc2protocol.model.Struct
+import me.honnold.sc2protocol.model.data.Struct
+import me.honnold.sc2protocol.model.event.Attribute
 import me.honnold.sc2protocol.model.event.AttributeEvents
 import me.honnold.sc2protocol.model.type.TypeInfo
 import me.honnold.sc2protocol.util.BitBuffer
@@ -144,7 +144,10 @@ class Protocol(build: Int) {
             val value = StandardCharsets.UTF_8.decode(valueBuffer).toString()
                 .replaceFirst("\u0000", "").reversed()
 
-            attributeEvents.addToScope(scope, Attribute(namespace, id, scope, value))
+            attributeEvents.addToScope(
+                scope,
+                Attribute(namespace, id, scope, value)
+            )
         }
 
         return attributeEvents
