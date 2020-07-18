@@ -1,8 +1,6 @@
 package me.honnold.sc2protocol.decoder
 
-import me.honnold.sc2protocol.model.Bounds
-import me.honnold.sc2protocol.model.Field
-import me.honnold.sc2protocol.model.Struct
+import me.honnold.sc2protocol.model.*
 import me.honnold.sc2protocol.model.type.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -103,11 +101,11 @@ class VersionedBitDecoder(
         }
     }
 
-    override fun getBitArray(bounds: Bounds): BitSet {
+    override fun getBitArray(bounds: Bounds): BitArray {
         this.input.read(8)
 
         val length = this.getVNumber().toInt()
-        val bits = BitSet(length)
+        val bits = BitArray(length)
 
         this.input.align()
         (0 until length).forEach { bits.set(it, this.input.read(1) != 0L) }
@@ -115,13 +113,13 @@ class VersionedBitDecoder(
         return bits
     }
 
-    override fun getBlob(bounds: Bounds): ByteBuffer {
+    override fun getBlob(bounds: Bounds): Blob {
         this.input.read(8)
 
         val length = this.getVNumber().toInt()
 
         this.input.align()
-        return this.input.readBytes(length)
+        return Blob(this.input.readBytes(length))
     }
 
     override fun getBool(): Boolean {

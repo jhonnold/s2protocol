@@ -1,8 +1,6 @@
 package me.honnold.sc2protocol.decoder
 
-import me.honnold.sc2protocol.model.Bounds
-import me.honnold.sc2protocol.model.Field
-import me.honnold.sc2protocol.model.Struct
+import me.honnold.sc2protocol.model.*
 import me.honnold.sc2protocol.model.type.*
 import me.honnold.sc2protocol.util.BitBuffer
 import java.nio.ByteBuffer
@@ -29,8 +27,8 @@ abstract class Decoder(val infos: List<TypeInfo>, buffer: ByteBuffer, order: Byt
     }
 
     abstract fun getArray(bounds: Bounds, id: Int): List<Any?>
-    abstract fun getBitArray(bounds: Bounds): BitSet
-    abstract fun getBlob(bounds: Bounds): ByteBuffer
+    abstract fun getBitArray(bounds: Bounds): BitArray
+    abstract fun getBlob(bounds: Bounds): Blob
     abstract fun getBool(): Boolean
     abstract fun getChoice(bounds: Bounds, fields: List<Field>): Pair<String, Any?>
     abstract fun getFourCC(): Long
