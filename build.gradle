@@ -14,8 +14,8 @@ repositories {
 
 dependencies {
     implementation group: "org.jetbrains.kotlin", name: "kotlin-stdlib-jdk8"
-    implementation group: "me.honnold", name: "mpq", version: "1.0.0"
 
+    testImplementation group: "me.honnold", name: "mpq", version: "1.0.1"
     testImplementation group: "org.jetbrains.kotlin", name: "kotlin-test"
     testImplementation group: "org.jetbrains.kotlin", name: "kotlin-test-junit"
 }
