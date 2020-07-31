@@ -24,7 +24,13 @@ jobs:
         run: gradle build
 
       - name: Publish to GitHub Packages
-        run: gradle publishPROTOCOLPublicationToGithubPackagesRepository
+        run: gradle publishS2protocolPublicationToGithubPackagesRepository
         env:
           GITHUB_USER: ${{ github.actor }}
           GITHUB_KEY: ${{ secrets.GITHUBKEY }}
+
+      - name: Publish to Bintray
+        run: gradle bintrayUpload
+        env:
+          BINTRAY_USER: jhonnold
+          BINTRAY_KEY: ${{ secrets.BINTRAYKEY }}

@@ -28,11 +28,11 @@ compileTestKotlin {
 }
 
 group 'me.honnold'
-version '1.0.2'
+version '1.0.3'
 
 publishing {
     publications {
-        PROTOCOL(MavenPublication) {
+        s2protocol(MavenPublication) {
             from components.java
         }
     }
@@ -40,7 +40,7 @@ publishing {
     repositories {
         maven {
             name = "GithubPackages"
-            url = "https://maven.pkg.github.com/jhonnold/sc2protocol"
+            url = "https://maven.pkg.github.com/jhonnold/s2protocol"
 
             credentials {
                 username = project.hasProperty("github.user") ? project.property("github.user") : System.getenv("GITHUB_USER")
@@ -53,10 +53,10 @@ publishing {
 bintray {
     user = project.hasProperty("bintray.user") ? project.property("bintray.user") : System.getenv("BINTRAY_USER")
     key = project.hasProperty("bintray.key") ? project.property("bintray.key") : System.getenv("BINTRAY_KEY")
-    publications = ['PROTOCOL']
+    publications = ['s2protocol']
 
     pkg {
         repo = 'maven'
-        name = 'sc2protocol'
+        name = 's2protocol'
     }
 }
